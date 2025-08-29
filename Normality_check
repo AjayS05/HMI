@@ -1,0 +1,12 @@
+shapiro_test_results <- data.frame(
+  Variable = c("Performance", "Satisfaction", "Workload", "Usability"),
+  Shapiro_p_value = c(
+    shapiro.test(df$Performance_combined)$p.value,
+    shapiro.test(df$Satisfaction_minmax)$p.value,
+    shapiro.test(df$Workload_score)$p.value,
+    shapiro.test(df$SUS_score)$p.value
+  )
+)
+
+# Print Shapiro-Wilk test results
+print(shapiro_test_results)
