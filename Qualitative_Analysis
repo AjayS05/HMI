@@ -1,0 +1,85 @@
+# Install and load necessary libraries
+# install.packages("tm")
+# install.packages("tidyverse")
+# install.packages("tidytext")
+library(tm)
+library(tidyverse)
+library(tidytext)
+
+# Assuming 'qualitative_df' contains the interview data with a column 'Feedback'
+# Clean the text data by removing unnecessary elements (punctuation, stop words, etc.)
+
+clean_text <- qualitative_df$Feedback %>%
+  tolower() %>%
+  removePunctuation() %>%
+  removeNumbers() %>%
+  removeWords(stopwords("en")) %>%
+  stripWhitespace()
+
+# Convert to data frame for further processing
+cleaned_df <- data.frame(Feedback = clean_text)
+
+# Tokenize the cleaned text (splitting text into words)
+tidy_text <- cleaned_df %>%
+  unnest_tokens(word, Feedback)
+
+# View the first few rows of the tidy text
+head(tidy_text)
+
+# Install and load sentimentr if necessary
+# install.packages("sentimentr")
+library(sentimentr)
+
+# Perform sentiment analysis on the feedback
+sentiment_scores <- sentiment(cleaned_df$Feedback)
+
+# View the sentiment scores for each response
+head(sentiment_scores)
+
+# You can aggregate the sentiment scores by averaging them
+mean_sentiment <- mean(sentiment_scores$sentiment)
+print(paste("Average Sentiment Score: ", mean_sentiment))
+
+# Count word frequencies in the feedback
+word_count <- tidy_text %>%
+  count(word, sort = TRUE)
+
+# View the top 10 most frequent words
+head(word_count, 10)
+
+# Plot the word frequency
+library(ggplot2)
+word_count %>%
+  top_n(10) %>%
+  ggplot(aes(x = reorder(word, n), y = n)) +
+  geom_bar(stat = "identity") +
+  labs(x = "Words", y = "Frequency", title = "Top 10 Words in Feedback") +
+  coord_flip()
+
+# Install and load the necessary library
+# install.packages("topicmodels")
+library(topicmodels)
+
+# Create a document-term matrix
+dtm <- tidy_text %>%
+  count(word) %>%
+  cast_dtm(document = 1:nrow(tidy_text), term = word, value = n)
+
+# Apply Latent Dirichlet Allocation (LDA)
+lda_model <- LDA(dtm, k = 3)  # 'k' is the number of topics
+topics <- tidy(lda_model, matrix = "beta")
+
+# View the top words for each topic
+top_words <- topics %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+
+# Plot the top words for each topic
+library(ggplot2)
+ggplot(top_words, aes(x = reorder(term, beta), y = beta, fill = factor(topic))) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~topic, scales = "free") +
+  coord_flip() +
+  labs(x = "Words", y = "Beta Value", title = "Top Words in Each Topic")
