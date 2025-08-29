@@ -1,0 +1,74 @@
+# Wilcoxon Signed-Rank Test for Performance
+performance_test <- wilcox.test(df$Performance_assisted, df$Performance_free, paired = TRUE)
+print(performance_test)
+
+# Wilcoxon Signed-Rank Test for Satisfaction
+satisfaction_test <- wilcox.test(df$Satisfaction_assisted, df$Satisfaction_free, paired = TRUE)
+print(satisfaction_test)
+
+# Wilcoxon Signed-Rank Test for Workload
+workload_test <- wilcox.test(df$Workload_assisted, df$Workload_free, paired = TRUE)
+print(workload_test)
+
+# Wilcoxon Signed-Rank Test for Usability
+usability_test <- wilcox.test(df$Usability_assisted, df$Usability_free, paired = TRUE)
+print(usability_test)
+
+# Function to calculate rank-biserial correlation
+rank_biserial <- function(w_statistic, n) {
+  r = (2 * w_statistic - n * (n + 1)) / (n * n)
+  return(r)
+}
+
+# For Performance
+r_performance <- rank_biserial(performance_test$statistic, length(df$Performance_assisted))
+print(paste("Rank-biserial correlation for Performance: ", r_performance))
+
+# For Satisfaction
+r_satisfaction <- rank_biserial(satisfaction_test$statistic, length(df$Satisfaction_assisted))
+print(paste("Rank-biserial correlation for Satisfaction: ", r_satisfaction))
+
+# For Workload
+r_workload <- rank_biserial(workload_test$statistic, length(df$Workload_assisted))
+print(paste("Rank-biserial correlation for Workload: ", r_workload))
+
+# For Usability
+r_usability <- rank_biserial(usability_test$statistic, length(df$Usability_assisted))
+print(paste("Rank-biserial correlation for Usability: ", r_usability))
+
+# Install and load the TOSTER package if not already installed
+# install.packages("TOSTER")
+library(TOSTER)
+
+# Perform the TOST procedure for Performance
+performance_tost <- tost(paired = TRUE, 
+                         m1 = df$Performance_assisted, 
+                         m2 = df$Performance_free, 
+                         low_eqbound = -5,  # lower equivalence bound
+                         high_eqbound = 5)  # upper equivalence bound
+print(performance_tost)
+
+# Perform the TOST procedure for Satisfaction
+satisfaction_tost <- tost(paired = TRUE, 
+                          m1 = df$Satisfaction_assisted, 
+                          m2 = df$Satisfaction_free, 
+                          low_eqbound = -5, 
+                          high_eqbound = 5)
+print(satisfaction_tost)
+
+# Perform the TOST procedure for Workload
+workload_tost <- tost(paired = TRUE, 
+                      m1 = df$Workload_assisted, 
+                      m2 = df$Workload_free, 
+                      low_eqbound = -5, 
+                      high_eqbound = 5)
+print(workload_tost)
+
+# Perform the TOST procedure for Usability
+usability_tost <- tost(paired = TRUE, 
+                       m1 = df$Usability_assisted, 
+                       m2 = df$Usability_free, 
+                       low_eqbound = -5, 
+                       high_eqbound = 5)
+print(usability_tost)
+
