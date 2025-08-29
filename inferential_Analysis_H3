@@ -1,0 +1,42 @@
+# Install and load the ART package if not already installed
+# install.packages("ARTool")
+library(ARTool)
+
+# Perform ART RM ANOVA for each DV with Task Type * Prompting Style interaction
+performance_art <- art(Performance_assisted ~ Task_type * Prompting_style + (1|Participant_ID), data = df)
+summary(performance_art)
+
+satisfaction_art <- art(Satisfaction_assisted ~ Task_type * Prompting_style + (1|Participant_ID), data = df)
+summary(satisfaction_art)
+
+workload_art <- art(Workload_assisted ~ Task_type * Prompting_style + (1|Participant_ID), data = df)
+summary(workload_art)
+
+usability_art <- art(Usability_assisted ~ Task_type * Prompting_style + (1|Participant_ID), data = df)
+summary(usability_art)
+
+# If interaction effect is not significant, test for main effects
+performance_main <- art(Performance_assisted ~ Task_type + Prompting_style + (1|Participant_ID), data = df)
+summary(performance_main)
+
+satisfaction_main <- art(Satisfaction_assisted ~ Task_type + Prompting_style + (1|Participant_ID), data = df)
+summary(satisfaction_main)
+
+workload_main <- art(Workload_assisted ~ Task_type + Prompting_style + (1|Participant_ID), data = df)
+summary(workload_main)
+
+usability_main <- art(Usability_assisted ~ Task_type + Prompting_style + (1|Participant_ID), data = df)
+summary(usability_main)
+
+# If significant, perform pairwise comparisons for Task Types
+performance_pairwise <- pairwise.wilcox.test(df$Performance_assisted, df$Task_type, paired = TRUE)
+print(performance_pairwise)
+
+satisfaction_pairwise <- pairwise.wilcox.test(df$Satisfaction_assisted, df$Task_type, paired = TRUE)
+print(satisfaction_pairwise)
+
+workload_pairwise <- pairwise.wilcox.test(df$Workload_assisted, df$Task_type, paired = TRUE)
+print(workload_pairwise)
+
+usability_pairwise <- pairwise.wilcox.test(df$Usability_assisted, df$Task_type, paired = TRUE)
+print(usability_pairwise)
