@@ -1,0 +1,27 @@
+# Assuming 'df' is the data frame containing your original data
+
+# 1. Performance: Initial scoring and scaling
+df$Time_score <- 100 - (df$task_completion_time / max(df$task_completion_time)) * 100  # Normalize time to 0-100
+df$Prompt_minmax <- (df$num_prompts - min(df$num_prompts)) / (max(df$num_prompts) - min(df$num_prompts)) * 100  # Min-Max scale for prompts
+df$Time_zscore <- (df$task_completion_time - mean(df$task_completion_time)) / sd(df$task_completion_time)  # Z-score for time
+df$Performance_combined <- (df$Time_zscore * 50) + df$Prompt_minmax  # Combine Time and Prompt
+
+# 2. Satisfaction: Min-Max scaling for NPS (Satisfaction)
+df$Satisfaction_minmax <- (df$Satisfaction - min(df$Satisfaction)) / (max(df$Satisfaction) - min(df$Satisfaction)) * 100
+
+# 3. Workload: Min-Max scaling for NASA-TLX
+df$Workload_score <- rowMeans(df[, c('Mental_Demand', 'Physical_Demand', 'Temporal_Demand', 
+                                      'Performance', 'Effort', 'Frustration')])
+
+
+
+# 4. Usability: Min-Max scaling for SUS
+df$SUS_score <- (
+  (df$Q1 - 1) + (5 - df$Q2) + (df$Q3 - 1) + (5 - df$Q4) + 
+  (df$Q5 - 1) + (5 - df$Q6) + (df$Q7 - 1) + (5 - df$Q8) + 
+  (df$Q9 - 1) + (5 - df$Q10)
+) * 2.5 / 10
+
+
+# Check the first few rows to verify all transformations
+head(df[, c('Performance_combined', 'Satisfaction_minmax', 'Workload_minmax', 'Usability_minmax')])
