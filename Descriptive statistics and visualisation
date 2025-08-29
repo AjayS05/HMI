@@ -1,0 +1,34 @@
+# Descriptive statistics for all DVs (mean and standard deviation)
+descriptive_stats <- data.frame(
+  Variable = c("Performance", "Satisfaction", "Workload", "Usability"),
+  Mean = c(mean(df$Performance_combined), mean(df$Satisfaction_minmax), mean(df$Workload_score), mean(df$SUS_score)),
+  SD = c(sd(df$Performance_combined), sd(df$Satisfaction_minmax), sd(df$Workload_score), sd(df$SUS_score))
+)
+
+
+# Load required library for visualization
+library(ggplot2)
+
+# Box plot for Performance
+ggplot(df, aes(x = factor(0), y = Performance_combined)) +
+  geom_boxplot() +
+  labs(title = "Performance Distribution", y = "Performance Score") +
+  theme_minimal()
+
+# Box plot for Satisfaction
+ggplot(df, aes(x = factor(0), y = Satisfaction_minmax)) +
+  geom_boxplot() +
+  labs(title = "Satisfaction Distribution", y = "Satisfaction Score") +
+  theme_minimal()
+
+# Box plot for Workload
+ggplot(df, aes(x = factor(0), y = Workload_score)) +
+  geom_boxplot() +
+  labs(title = "Workload Distribution", y = "Workload Score") +
+  theme_minimal()
+
+# Box plot for Usability
+ggplot(df, aes(x = factor(0), y = SUS_score)) +
+  geom_boxplot() +
+  labs(title = "Usability Distribution", y = "Usability Score") +
+  theme_minimal()
