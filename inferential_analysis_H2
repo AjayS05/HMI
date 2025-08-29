@@ -1,0 +1,57 @@
+# Perform Friedman test for each DV
+performance_friedman <- friedman.test(
+  cbind(df$Performance_assisted, df$Performance_free) ~ df$Task_type | df$Participant_ID
+)
+satisfaction_friedman <- friedman.test(
+  cbind(df$Satisfaction_assisted, df$Satisfaction_free) ~ df$Task_type | df$Participant_ID
+)
+workload_friedman <- friedman.test(
+  cbind(df$Workload_assisted, df$Workload_free) ~ df$Task_type | df$Participant_ID
+)
+usability_friedman <- friedman.test(
+  cbind(df$Usability_assisted, df$Usability_free) ~ df$Task_type | df$Participant_ID
+)
+
+# Print Friedman test results
+print(performance_friedman)
+print(satisfaction_friedman)
+print(workload_friedman)
+print(usability_friedman)
+
+# Perform Pairwise Comparisons (Wilcoxon signed-rank test) if Friedman is significant
+performance_pairwise <- list()
+performance_pairwise$Summarization_vs_IR <- wilcox.test(
+  df$Performance_assisted[df$Task_type == "Summarization"], 
+  df$Performance_assisted[df$Task_type == "Information Retrieval"], 
+  paired = TRUE
+)
+performance_pairwise$Summarization_vs_DL <- wilcox.test(
+  df$Performance_assisted[df$Task_type == "Summarization"], 
+  df$Performance_assisted[df$Task_type == "Data Labeling"], 
+  paired = TRUE
+)
+performance_pairwise$IR_vs_DL <- wilcox.test(
+  df$Performance_assisted[df$Task_type == "Information Retrieval"], 
+  df$Performance_assisted[df$Task_type == "Data Labeling"], 
+  paired = TRUE
+)
+
+# Print pairwise comparison results
+print(performance_pairwise)
+
+# Calculate Kendall's W for effect size
+kendall_w <- function(friedman_statistic, n, k) {
+  w = (12 * friedman_statistic) / (n * k * (k + 1)) - 3 * (n + 1)
+  return(w)
+}
+
+w_performance <- kendall_w(performance_friedman$statistic, n = length(df$Performance_assisted), k = 3)
+w_satisfaction <- kendall_w(satisfaction_friedman$statistic, n = length(df$Satisfaction_assisted), k = 3)
+w_workload <- kendall_w(workload_friedman$statistic, n = length(df$Workload_assisted), k = 3)
+w_usability <- kendall_w(usability_friedman$statistic, n = length(df$Usability_assisted), k = 3)
+
+# Print Kendall's W for effect size
+print(paste("Kendall's W for Performance: ", w_performance))
+print(paste("Kendall's W for Satisfaction: ", w_satisfaction))
+print(paste("Kendall's W for Workload: ", w_workload))
+print(paste("Kendall's W for Usability: ", w_usability))
